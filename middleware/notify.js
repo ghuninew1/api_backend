@@ -1,4 +1,4 @@
-const { lineNotifyFn } = require("../lib/notifyFn");
+const { lineNotifyFn } = require("../utils/notifyFn");
 
 exports.lineNotify = async (req, res, next) => {
     try {
@@ -17,6 +17,6 @@ exports.lineNotify = async (req, res, next) => {
 
         next();
     } catch (err) {
-        res.status(500).json({ msg: `Error retrieving data: ${err}` });
+        return res.status(500).json({ msg: `Error retrieving data: ${err}` });
     }
 };

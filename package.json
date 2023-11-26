@@ -1,37 +1,38 @@
 {
-    "name": "api-backend",
-    "version": "1.0.0",
-    "description": "https://github.com/ghuninew1",
-    "author": "GhuniNew",
-    "type": "commonjs",
-    "license": "MIT",
-    "scripts": {
-        "dev": "nodemon ./bin/www",
-        "pm2": "pm2 start server.js --name api-nodejs",
-        "dev2": "bun --watch run ./bin/www",
-        "test": "jest --watchAll",
-        "start": "node ./bin/www"
-    },
-    "dependencies": {
-        "axios": "^1.6.2",
-        "body-parser": "^1.20.2",
-        "cors": "^2.8.5",
-        "dotenv": "^16.3.1",
-        "express": "^4.18.2",
-        "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.0.1",
-        "nodemailer": "^6.9.7"
-    },
-    "devDependencies": {
-        "@types/node": "^20.9.1",
-        "bcryptjs": "^2.4.3",
-        "morgan": "^1.10.0",
-        "multer": "1.4.5-lts.1",
-        "nodemon": "^3.0.1",
-        "ping": "^0.4.4",
-        "sharp": "^0.32.6",
-        "xml2js": "^0.6.2"
-    },
-    "main": "ิbin/www.js",
-    "keywords": []
+  "name": "api-backend",
+  "version": "1.0.0",
+  "description": "https://github.com/ghuninew1",
+  "author": "GhuniNew",
+  "type": "commonjs",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "pm2": "pm2 start server.js --name api-nodejs",
+    "dev2": "bun --watch run server.js",
+    "test": "jest --watchAll",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "5.0.0-beta.1",
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.1",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "bcryptjs": "^2.4.3",
+    "morgan": "^1.10.0",
+    "multer": "1.4.5-lts.1",
+    "nodemon": "^3.0.1",
+    "ping": "^0.4.4",
+    "sharp": "^0.32.6",
+    "xml2js": "^0.6.2"
+  },
+  "keywords": [],
+  "main": "server.js"
 }

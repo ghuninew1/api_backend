@@ -1,10 +1,11 @@
 const fs = require("fs");
-const mongoose = require("mongoose");
 const db = require("../models");
 
 exports.findAll = async (req, res) => {
     try {
-        const dbAll = await mongoose.connection.db.listCollections().toArray();
+        const dbAll = await db.mongoose.connection.db
+            .listCollections()
+            .toArray();
         const data = dbAll.map((item) => {
             const name = item.name && item.name;
             const type = item.type && item.type;
@@ -13,12 +14,12 @@ exports.findAll = async (req, res) => {
             return (item = { name, type, timeseries });
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             data,
             count: data.length,
         });
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Error retrieving data: ${err}`,
         });
     }
@@ -40,9 +41,9 @@ exports.findOne = async (req, res) => {
             .limit(limit ? (limit > 1 ? limit : 0) : 20)
             .exec();
 
-        res.status(200).json(data);
+        return res.status(200).json(data);
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Error retrieving data: ${err}`,
         });
     }
@@ -57,9 +58,9 @@ exports.findById = async (req, res) => {
             throw res.status(404).json({ msg: "please enter name" });
         const data = await db[name].findOne({ _id: id }).exec();
 
-        res.status(200).json(data);
+        return res.status(200).json(data);
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Error retrieving data: ${err}`,
         });
     }
@@ -78,9 +79,9 @@ exports.createByName = async (req, res) => {
         const fileCreate = new db[name](data);
         await fileCreate.save();
 
-        res.status(201).json(fileCreate);
+        return res.status(201).json(fileCreate);
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Error retrieving data: ${err}`,
         });
     }
@@ -110,9 +111,9 @@ exports.updateByid = async (req, res) => {
             });
         }
 
-        res.status(200).json(data);
+        return res.status(200).json(data);
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Error retrieving data: ${err}`,
         });
     }
@@ -135,9 +136,9 @@ exports.deleteByid = async (req, res) => {
             res.status(200).json("Delete Success " + id);
         }
 
-        res.status(200).json("Delete Success" + id);
+        return res.status(200).json("Delete Success" + id);
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Error retrieving data: ${err}`,
         });
     }
@@ -153,9 +154,9 @@ exports.deleteAll = async (req, res) => {
 
         if (!modelDelete && modelDelete.deletedCount === 0)
             throw res.status(404).json({ msg: "Data not found" });
-        else res.status(200).json("Delete Success");
+        else return res.status(200).json("Delete Success");
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             msg: `Error retrieving data: ${err}`,
         });
     }

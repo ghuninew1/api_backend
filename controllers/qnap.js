@@ -1,6 +1,6 @@
 require("dotenv").config();
 const axios = require("axios").default;
-const { ezEncode, utf16to8 } = require("../lib/get_sid");
+const { ezEncode, utf16to8 } = require("../utils/get_sid");
 const { parseStringPromise } = require("xml2js");
 const db = require("../models");
 const Qnap = db.qnap;
@@ -30,12 +30,12 @@ exports.qnapLogin = async (req, res) => {
             //     function_support: dataXml["QDocRoot"]["function_support"][0],
             // });
             // await qnap.save();
-            res.status(200).json(dataSid);
+            return res.status(200).json(dataSid);
         } else {
-            res.status(403).json({ message: "login failed" });
+            return res.status(403).json({ message: "login failed" });
         }
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 };
 
@@ -43,7 +43,7 @@ exports.qnapTree = async (req, res) => {
     try {
         const sid = req.query.sid || "";
         if (sid === "" || sid == "null") {
-            res.status(403).json({ message: "sid is required" });
+            return res.status(403).json({ message: "sid is required" });
         }
 
         const node = req.query.node || "/sky"; // /sky or /sky/xxx
@@ -53,12 +53,12 @@ exports.qnapTree = async (req, res) => {
         const data = await axios.get(url);
 
         if (data && data.data?.length > 0) {
-            res.status(200).json(data.data);
+            return res.status(200).json(data.data);
         } else {
-            res.status(403).json({ message: "tree failed" });
+            return res.status(403).json({ message: "tree failed" });
         }
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 };
 
@@ -66,7 +66,7 @@ exports.qnapList = async (req, res) => {
     try {
         const sid = req.query.sid || "";
         if (sid === "" || sid == "null") {
-            res.status(403).json({ message: "sid is required" });
+            return res.status(403).json({ message: "sid is required" });
         }
 
         const is_iso = req.query.is_iso || 0; // 0 or 1
@@ -83,12 +83,12 @@ exports.qnapList = async (req, res) => {
         const dataRes = await axios.get(url);
 
         if (dataRes.data) {
-            res.status(200).json(dataRes.data);
+            return res.status(200).json(dataRes.data);
         } else {
-            res.status(403).json({ message: "list failed" });
+            return res.status(403).json({ message: "list failed" });
         }
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 };
 
@@ -96,7 +96,7 @@ exports.qnapSearch = async (req, res) => {
     try {
         const sid = req.query.sid || "";
         if (sid === "" || sid == "null") {
-            res.status(403).json({ message: "sid is required" });
+            return res.status(403).json({ message: "sid is required" });
         }
 
         const keyword = req.query.keyword || "";
@@ -116,15 +116,15 @@ exports.qnapSearch = async (req, res) => {
             const dataRes = await axios.get(
                 url.replace(/sid=v3l6y9b8/g, `sid=${sid}`)
             );
-            res.status(200).json(dataRes.data);
+            return res.status(200).json(dataRes.data);
         }
         if (dataRes.data?.datas.length > 0) {
-            res.status(200).json(dataRes.data);
+            return res.status(200).json(dataRes.data);
         } else {
-            res.status(403).json({ message: "search failed" });
+            return res.status(403).json({ message: "search failed" });
         }
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 };
 
@@ -132,7 +132,7 @@ exports.qnapDelete = async (req, res) => {
     try {
         const sid = req.query.sid || "";
         if (sid === "" || sid == "null") {
-            res.status(403).json({ message: "sid is required" });
+            return res.status(403).json({ message: "sid is required" });
         }
 
         const path = req.query.path || "";
@@ -150,14 +150,14 @@ exports.qnapDelete = async (req, res) => {
             const dataRes = await axios.delete(
                 url.replace(/sid=v3l6y9b8/g, `sid=${sid}`)
             );
-            res.status(200).json("delete success");
+            return res.status(200).json("delete success");
         }
         if (dataRes.data?.datas.length > 0) {
-            res.status(200).json("delete success");
+            return res.status(200).json("delete success");
         } else {
-            res.status(403).json({ message: "delete failed" });
+            return res.status(403).json({ message: "delete failed" });
         }
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 };

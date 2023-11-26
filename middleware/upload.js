@@ -1,29 +1,31 @@
 const multer = require("multer");
+const fs = require("fs");
+
+const timestamp = new Date().toISOString().split("T")[0];
+const path = `./public/uploads/${timestamp}`;
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "./public/uploads");
+    destination: (req, file, cb) => {
+        cb(null, path);
     },
-    filename: function (req, file, cb) {
-        const uniqueSuffix =
-            new Date().toLocaleDateString("th").replace(/\//g, "_") +
-            "_" +
-            new Date().toLocaleTimeString("th").replace(/:/g, "-") +
-            "_" +
-            req.params.name;
+    filename: (req, file, cb) => {
+        const uniqueSuffix = new Date().toISOString().replace(/:/g, "-");
+
         cb(null, uniqueSuffix + "_" + file.originalname);
     },
 });
 
-// exports.upload = multer({storage: storage,limits: { fileSize: 1024 * 1024 * 10000 }}).single("file");
 exports.upload = (req, res, next) => {
     try {
+        if (!fs.existsSync(path)) {
+            fs.mkdirSync(path);
+        }
         const upload = multer({
             storage: storage,
             limits: { fileSize: 1024 * 1024 * 10000 },
         }).single("file");
 
-        upload(req, res, function (err) {
+        upload(req, res, (err) => {
             if (err instanceof multer.MulterError)
                 return res.status(500).json({ msg: err.message });
             else if (err)
@@ -34,7 +36,32 @@ exports.upload = (req, res, next) => {
             next();
         });
     } catch (err) {
-        res.status(500).json({ msg: `Error retrieving data: ${err}` });
+        next(err);
+    }
+};
+
+exports.uploadMultiple = (req, res, next) => {
+    try {
+        if (!fs.existsSync(path)) {
+            fs.mkdirSync(path);
+        }
+        const upload = multer({
+            storage: storage,
+            limits: { fileSize: 1024 * 1024 * 10000 },
+        }).array("files", 50);
+
+        upload(req, res, (err) => {
+            if (err instanceof multer.MulterError)
+                return res.status(500).json({ msg: err.message });
+            else if (err)
+                return res
+                    .status(500)
+                    .json({ msg: `Error retrieving data: ${err}` });
+
+            next();
+        });
+    } catch (err) {
+        next(err);
     }
 };
 
@@ -60,6 +87,6 @@ exports.progressUpload = (req, res, next) => {
         });
         next();
     } catch (err) {
-        res.status(500).json({ msg: `Error retrieving data: ${err}` });
+        return res.status(500).json({ msg: `Error retrieving data: ${err}` });
     }
 };

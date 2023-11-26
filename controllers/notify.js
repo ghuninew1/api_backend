@@ -1,4 +1,4 @@
-const { lineNotifyFn } = require("../lib/notifyFn");
+const { lineNotifyFn } = require("../utils/notifyFn");
 
 exports.lineNotify = async (req, res) => {
     try {
@@ -9,10 +9,10 @@ exports.lineNotify = async (req, res) => {
             const lineNotify = await lineNotifyFn(body);
             const data = await lineNotify;
 
-            res.status(200).json(data);
+            return res.status(200).json(data);
         } else
             return res.status(404).json({ message: "Not Found enter message" });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 };

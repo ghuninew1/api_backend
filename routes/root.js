@@ -1,15 +1,25 @@
 const router = require("express").Router();
 const { spawnSync } = require("child_process");
 
-router.get("/", async (req, res) => {
+router.get("/", (req, res) => {
+    res.status(200).json({
+        message: "API GhuniNew",
+        ip: req.ip,
+        protocol: req.protocol,
+        uptime: Math.floor(process.uptime() * 1000) / 1000,
+        session: req.session,
+    });
+});
+
+router.get("/ps", async (req, res) => {
     try {
         const spaw = spawnSync("ps", ["au"]);
         if (spaw.stderr.toString().length > 0) {
-            throw new Error(spaw.stderr.toString());
+            throw res.status(500).json({ error: spaw.stderr.toString() });
         }
 
         if (spaw.stdout.toString().length === 0) {
-            throw new Error("No data returned");
+            throw res.status(500).json({ error: "No data" });
         }
         const data = spaw.stdout.toString().split("\n");
         const dataArr = [];
@@ -19,23 +29,23 @@ router.get("/", async (req, res) => {
         data.forEach((item) => {
             const itemArr = item.split(/\s+/);
             const itemObj = {
-                "": itemArr[0],
-                PID: itemArr[1],
-                TT: itemArr[2],
-                STAT: itemArr[3],
-                TIME: itemArr[4],
-                COMMAND: itemArr[5],
-                "": itemArr[6],
-                "": itemArr[7],
-                "": itemArr[8],
-                "": itemArr[9],
-                "": itemArr.slice(10).join(" "),
+                user: itemArr[0],
+                pid: itemArr[1],
+                cpu: itemArr[2],
+                mem: itemArr[3],
+                vsz: itemArr[4],
+                rss: itemArr[5],
+                tty: itemArr[6],
+                stat: itemArr[7],
+                start: itemArr[8],
+                time: itemArr[9],
+                command: itemArr[10],
             };
             dataArr.push(itemObj);
         });
         res.status(200).json(dataArr);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 

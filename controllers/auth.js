@@ -1,168 +1,114 @@
 const db = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { secret, option } = require("./auth.config");
+require("dotenv").config();
+const secret = process.env.JWT_SECRET;
+const option = { expiresIn: "1d" };
+const { createError } = require("../utils/error");
 
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => {
     try {
         const { username, password, email } = req.body;
-        if (
-            username === "" ||
-            password === "" ||
-            username == null ||
-            password == null
-        )
-            throw res
-                .status(404)
-                .json({ msg: "please enter name or password" });
+        if (!username || !password || !email)
+            return next(createError(400, "Please enter all fields"));
 
-        let user = await db.users.findOne({ username });
+        const user = await db.users.findOne({ username });
 
-        user && res.status(400).json({ msg: "User already exists" });
+        user && next(createError(400, "User already exists"));
 
-        const salt = await bcrypt.genSalt(10);
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
+
         user = new db.users({
-            username,
-            password,
-            email,
-            roles: [
-                {
-                    role: "user",
-                    id: 100,
-                },
-            ],
+            ...req.body,
+            password: hash,
         });
-        user.password = await bcrypt.hash(password, salt);
         await user.save();
 
-        user = user.toObject();
-        delete user.password;
-        res.status(201).json(user);
+        return res.status(201).json({ msg: "User created" });
     } catch (err) {
-        res.status(500).json({ msg: `Error retrieving data: ${err}` });
+        next(err);
     }
 };
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
     try {
         const { username, password } = req.body;
-        if (
-            username === "" ||
-            password === "" ||
-            username == null ||
-            password == null
-        )
-            throw res
-                .status(404)
-                .json({ msg: "please enter name or password" });
+        if (!username || !password)
+            return next(createError(400, "Please enter all fields"));
 
         const user = await db.users.findOneAndUpdate(
             { username },
             { new: true }
         );
-        if (user && user.enabled) {
-            const isMatch = bcrypt.compare(password, user.password);
-            if (!isMatch)
-                return res.status(400).json({ msg: "Invalid Credentials" });
+        if (user) {
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) return next(createError(400, "Invalid Credentials"));
 
             let payload = {
-                user: {
-                    username: user.username,
-                    email: user.email,
-                    token: user.tokens[0]?.token,
-                    expires: user.tokens[0]?.expires,
-                },
+                username: user.username,
+                isAdmin: user.isAdmin,
             };
+
             if (user.tokens.length > 0) {
                 const token = user.tokens[0];
                 if (Date.now() > token.expires) {
                     user.tokens = [];
                     await user.save();
                     jwt.sign(payload, secret, option, async (err, token) => {
-                        if (err) throw res.status(500).json({ msg: err });
+                        if (err) return next(createError(500, err));
                         user.tokens = user.tokens.concat({
                             token,
                             expires: Date.now() + 86400000,
                         });
+                        user.isLogged = true;
                         await user.save();
-                        res.status(200).json(payload.user);
+                        user.password = undefined;
+
+                        res.status(200).json(user);
                     });
                 } else {
-                    res.status(200).json(payload.user);
+                    user.isLogged = true;
+                    await user.save();
+                    user.password = undefined;
+
+                    res.status(200).json(user);
                 }
             } else {
                 jwt.sign(payload, secret, option, async (err, token) => {
-                    if (err) throw res.status(500).json({ msg: err });
+                    if (err) return next(createError(500, err));
                     user.tokens = user.tokens.concat({
                         token,
                         expires: Date.now() + 86400000,
                     });
+                    user.isLogged = true;
                     await user.save();
+                    user.password = undefined;
 
-                    res.status(200).json({
-                        username: user.username,
-                        email: user.email,
-                        token: user.tokens[0]?.token,
-                        expires: user.tokens[0]?.expires,
-                    });
+                    res.status(200).json(user);
                 });
             }
-        } else return res.status(400).json({ msg: "Invalid Credentials" });
-    } catch (err) {
-        res.status(500).json({ msg: `Error retrieving data: ${err}` });
-    }
-};
-
-exports.currentUser = async (req, res) => {
-    try {
-        const user = await db.users
-            .findOne({ username: req.user.username })
-            .select("-password")
-            .exec();
-        if (!user) throw res.status(404).json({ msg: "User not found" });
-
-        res.status(200).json({
-            username: user.username,
-            email: user.email,
-            role_id: user.roles[0]?.id,
-            token: user.tokens[0]?.token,
-            expires: user.tokens[0]?.expires,
-            updatedAt: user.updatedAt,
-        });
-    } catch (err) {
-        res.status(500).json({ msg: `Error retrieving data: ${err}` });
-    }
-};
-
-exports.confirmUser = async (req, res) => {
-    try {
-        const username = req.query.username;
-        if (username === "" || username == null)
-            throw res.status(404).json({ msg: "please enter name" });
-
-        const user = await db.users.findOneAndUpdate(
-            { username: username },
-            { new: true }
-        );
-
-        !user && res.status(400).json({ msg: "User not found" });
-
-        if (user.enabled === false) {
-            user.enabled = true;
-            await user.save();
-            res.status(200).json({
-                enabled: true,
-                username: user.username,
-            });
-        } else {
-            user.enabled = false;
-            await user.save();
-            res.status(200).json({
-                enabled: false,
-                username: user.username,
-            });
         }
     } catch (err) {
-        res.status(500).json({ msg: `Error retrieving data: ${err}` });
+        next(err);
+    }
+};
+
+exports.currentUser = async (req, res, next) => {
+    try {
+        const user = req.user;
+        if (!user) return next(createError(403, "Unauthorized!"));
+
+        const userDb = await db.users.findOne({ username: user.username });
+        if (!userDb) return next(createError(403, "Unauthorized!"));
+        userDb.password = undefined;
+
+        if (req.session.views) {
+            res.status(200).json({ user: userDb, session: req.session });
+        } else {
+            res.status(200).json(userDb);
+        }
+    } catch (err) {
+        next(err);
     }
 };

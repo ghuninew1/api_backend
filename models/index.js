@@ -20,6 +20,17 @@ name.forEach((n) => {
 // db object
 db.names = name;
 db.url = process.env.MONGODB_URI;
+db.connect = async () => {
+    try {
+        await mongoose.connect(db.url);
+        console.log(
+            "Connected to mongoDB. V." + db.mongoose.version,
+            db.mongoose.connection.name
+        );
+    } catch (error) {
+        throw error;
+    }
+};
 
 // export the database
 module.exports = db;

@@ -1,4 +1,4 @@
-const { mailSend } = require("../lib/mailSend");
+const { mailSend } = require("../utils/mailSend");
 
 exports.sendMail = async (req, res) => {
     try {
@@ -16,9 +16,9 @@ exports.sendMail = async (req, res) => {
                 });
             });
         } else {
-            res.status(404).json({ message: "email is empty" });
+            return res.status(404).json({ message: "email is empty" });
         }
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 };
