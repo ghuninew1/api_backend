@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const filesSchema = new mongoose.Schema(
     {
@@ -18,4 +18,4 @@ const filesSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model("files", filesSchema, "files");
+export default mongoose.model("files", filesSchema, "files");

@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const pingSchema = new mongoose.Schema(
     {
         ip: String,
         res: Number,
-        createdAt: { type: Date, default: Date.now},
+        createdAt: { type: Date, default: Date.now },
         metadata: {
             max: Number,
             min: Number,
@@ -23,4 +23,4 @@ const pingSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model("ping", pingSchema, "ping");
+export default mongoose.model("ping", pingSchema, "ping");

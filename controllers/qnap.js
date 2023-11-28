@@ -1,17 +1,13 @@
-require("dotenv").config();
-const axios = require("axios").default;
-const { ezEncode, utf16to8 } = require("../utils/get_sid");
-const { parseStringPromise } = require("xml2js");
-const db = require("../models");
-const Qnap = db.qnap;
+import axios from "axios";
+import { ezEncode, utf16to8 } from "../utils/get_sid.js";
+import { parseStringPromise } from "xml2js";
 
 const qnapHost = process.env.QNAP_HOST;
 const endpoint = qnapHost + "/cgi-bin/";
 const cgi = endpoint + "filemanager/utilRequest.cgi";
-
 const loginUrl = endpoint + `authLogin.cgi`;
 
-exports.qnapLogin = async (req, res) => {
+export const qnapLogin = async (req, res) => {
     try {
         const user = req.query.user || process.env.QNAP_USER;
         const pass = req.query.pass || process.env.QNAP_PASS;
@@ -39,7 +35,7 @@ exports.qnapLogin = async (req, res) => {
     }
 };
 
-exports.qnapTree = async (req, res) => {
+export const qnapTree = async (req, res) => {
     try {
         const sid = req.query.sid || "";
         if (sid === "" || sid == "null") {
@@ -62,7 +58,7 @@ exports.qnapTree = async (req, res) => {
     }
 };
 
-exports.qnapList = async (req, res) => {
+export const qnapList = async (req, res) => {
     try {
         const sid = req.query.sid || "";
         if (sid === "" || sid == "null") {
@@ -92,7 +88,7 @@ exports.qnapList = async (req, res) => {
     }
 };
 
-exports.qnapSearch = async (req, res) => {
+export const qnapSearch = async (req, res) => {
     try {
         const sid = req.query.sid || "";
         if (sid === "" || sid == "null") {
@@ -128,7 +124,7 @@ exports.qnapSearch = async (req, res) => {
     }
 };
 
-exports.qnapDelete = async (req, res) => {
+export const qnapDelete = async (req, res) => {
     try {
         const sid = req.query.sid || "";
         if (sid === "" || sid == "null") {

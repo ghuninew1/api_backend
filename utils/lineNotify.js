@@ -1,7 +1,6 @@
-require("dotenv").config();
-const axios = require("axios").default;
+import axios from "axios";
 
-exports.lineNotifyFn = async (message) => {
+export const lineNotify = async (message) => {
     try {
         if (message !== undefined && message !== "") {
             const url = process.env.LINE_NOTIFY_URL;
@@ -11,8 +10,8 @@ exports.lineNotifyFn = async (message) => {
             };
             const body = `message=${message.replace(/ /g, "%20")}`;
 
-            const lineNotify = await axios.post(url, body, { headers });
-            const data = await lineNotify.data;
+            const dataSent = await axios.post(url, body, { headers });
+            const data = await dataSent.data;
 
             return data;
         } else console.log("Not Found enter message");

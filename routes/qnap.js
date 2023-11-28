@@ -1,11 +1,7 @@
-const router = require("express").Router();
-const {
-    qnapList,
-    qnapTree,
-    qnapLogin,
-    qnapSearch,
-    qnapDelete,
-} = require("../controllers/qnap");
+import express from "express";
+const router = express.Router();
+
+// import { view, visit } from "../middleware/view.js";
 
 router.get("/qnap/login", qnapLogin);
 router.get("/qnap/list", qnapList);
@@ -13,4 +9,4 @@ router.get("/qnap/tree", qnapTree);
 router.get("/qnap/search", qnapSearch);
 router.delete("/qnap/delete/:id", qnapDelete);
 
-module.exports = router;
+export default router;

@@ -1,11 +1,14 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const fs = require("node:fs");
-const morgan = require("morgan");
-const session = require("express-session");
-const db = require("./models");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import morgan from "morgan";
+import session from "express-session";
+import { connect } from "./models/index.js";
+import rootRoute from "./routes/root.js";
+import apiRoute from "./routes/api.js";
+import authRoute from "./routes/auth.js";
+import utilsRoute from "./routes/utils.js";
+import pingRoute from "./routes/ping.js";
 
 const app = express();
 app.disable("x-powered-by");
@@ -20,27 +23,14 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(express.static("./public"));
 app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
         resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: true,
-            httpOnly: true,
-            expires: new Date(Date.now() + 60 * 60 * 1000),
-        },
+        saveUninitialized: true,
     })
 );
-app.use((req, res, next) => {
-    if (!req.session.views) {
-        req.session.views = {};
-    }
-    const pathname = req.originalUrl || req.url;
-    req.session.views[pathname] = (req.session.views[pathname] || 0) + 1;
-
-    next();
-});
 
 // logger
 app.use(morgan("dev"));
@@ -56,9 +46,10 @@ app.use((req, res, next) => {
 });
 
 // Routes
-fs.readdirSync("./routes")
-    .filter((f) => f.endsWith(".js"))
-    .map((r) => app.use("/", require("./routes/" + r)));
+// fs.readdirSync("./routes")
+//     .filter((f) => f.endsWith(".js"))
+//     .map((r) => app.use("/", require("./routes/" + r)));
+app.use("/", rootRoute, apiRoute, authRoute, utilsRoute, pingRoute);
 
 // error handler
 app.use((err, req, res, next) => {
@@ -72,10 +63,10 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(process.env.PORT || 8800, () => {
-    db.connect();
+    connect();
     console.log(
         `Server is running http://localhost:${process.env.PORT || 8800}`
     );
 });
 
-module.exports = app;
+export default app;

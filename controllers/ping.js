@@ -1,8 +1,8 @@
-const ping = require("ping");
-const db = require("../models");
-const dns = require("dns");
+import ping from "ping";
+import dns from "node:dns";
+import Visit from "../models/visit.model.js";
 
-exports.pingCheck = async (req, res) => {
+export const pingCheck = async (req, res) => {
     try {
         const ip = req.query.ip;
         const ipss = ip?.split(",");
@@ -33,7 +33,7 @@ exports.pingCheck = async (req, res) => {
     }
 };
 
-exports.ipPublic = async (req, res) => {
+export const ipPublic = async (req, res) => {
     try {
         const ip = req.query.ip;
 
@@ -61,7 +61,7 @@ exports.ipPublic = async (req, res) => {
     }
 };
 
-exports.getIpTimeSeries = async (req, res) => {
+export const getIpTimeSeries = async (req, res) => {
     try {
         const ip = req.query.ip || req.ip;
         if (ip == null || ip == "") {
@@ -71,8 +71,8 @@ exports.getIpTimeSeries = async (req, res) => {
             if (err) {
                 return res.status(404).json({ message: "Not Found" });
             } else {
-                const ping = await db.visit.find({});
-                const count = await db.visit.countDocuments({});
+                const ping = await Visit.find({});
+                const count = await Visit.countDocuments({});
                 const result = {
                     ip: ip,
                     host: host,

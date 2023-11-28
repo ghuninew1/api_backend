@@ -1,4 +1,10 @@
-const {
+import express from "express";
+const router = express.Router();
+
+import { view, visit } from "../middleware/view.js";
+import { auth } from "../middleware/auth.js";
+import { upload } from "../middleware/upload.js";
+import {
     findOne,
     findById,
     findAll,
@@ -6,18 +12,14 @@ const {
     updateByid,
     createByName,
     deleteByid,
-} = require("../controllers/api");
-const { auth } = require("../middleware/auth");
-const { upload, progressUpload } = require("../middleware/upload");
+} from "../controllers/api.js";
 
-const router = require("express").Router();
-
-router.get("/api", /* auth, */ findAll);
+router.get("/api", /* auth, */ view, findAll);
 router.get("/api/:name", /* auth, */ findOne);
 router.get("/api/:name/:id", /* auth, */ findById);
-router.post("/api/:name", upload, createByName);
-router.put("/api/:name/:id", upload, updateByid);
+router.post("/api/:name", createByName);
+router.put("/api/:name/:id", updateByid);
 router.delete("/api/:name/:id", /* auth, */ deleteByid);
 router.delete("/del/:name", /* auth, */ deleteAll);
 
-module.exports = router;
+export default router;

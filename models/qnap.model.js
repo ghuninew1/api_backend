@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const qnapSchema = new mongoose.Schema(
     {
@@ -16,4 +16,4 @@ const qnapSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model("qnap", qnapSchema, "qnap");
+export default mongoose.model("qnap", qnapSchema, "qnap");

@@ -1,6 +1,6 @@
-const { lineNotifyFn } = require("../utils/notifyFn");
+import { lineNotify } from "../utils/lineNotify";
 
-exports.lineNotify = async (req, res, next) => {
+export const sendNotify = async (req, res, next) => {
     try {
         const user = req.body.username;
         const ip = req.ip || req.ips;
@@ -11,12 +11,11 @@ exports.lineNotify = async (req, res, next) => {
 
         const body = `message=${message.replace(/ /g, "%20")}`;
 
-        const data = await lineNotifyFn(body);
-
-        req.lineNotify = data;
+        const data = await lineNotify(body);
+        req.notify = data;
 
         next();
     } catch (err) {
-        return res.status(500).json({ msg: `Error retrieving data: ${err}` });
+        next(err);
     }
 };

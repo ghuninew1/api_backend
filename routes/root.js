@@ -1,7 +1,12 @@
-const router = require("express").Router();
-const { spawnSync } = require("child_process");
+import express from "express";
+const router = express.Router();
 
-router.get("/", (req, res) => {
+import { spawnSync } from "child_process";
+
+import { view, visit } from "../middleware/view.js";
+import { createError } from "../utils/createError.js";
+
+router.get("/", view, (req, res) => {
     res.status(200).json({
         message: "API GhuniNew",
         ip: req.ip,
@@ -11,18 +16,20 @@ router.get("/", (req, res) => {
     });
 });
 
-router.get("/ps", async (req, res) => {
+router.get("/ps", (req, res, next) => {
     try {
         const spaw = spawnSync("ps", ["au"]);
+
         if (spaw.stderr.toString().length > 0) {
-            throw res.status(500).json({ error: spaw.stderr.toString() });
+            return next(createError(500, spaw.stderr.toString()));
         }
 
         if (spaw.stdout.toString().length === 0) {
-            throw res.status(500).json({ error: "No data" });
+            return next(createError(500, "No data"));
         }
-        const data = spaw.stdout.toString().split("\n");
-        const dataArr = [];
+
+        let data = spaw.stdout.toString().split("\n");
+        let dataArr = [];
         data.pop();
         data.shift();
 
@@ -43,10 +50,11 @@ router.get("/ps", async (req, res) => {
             };
             dataArr.push(itemObj);
         });
-        res.status(200).json(dataArr);
+
+        return res.status(200).json(dataArr);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-module.exports = router;
+export default router;

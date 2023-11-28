@@ -1,12 +1,11 @@
-const router = require("express").Router();
-const { auth, authAdmin } = require("../middleware/auth");
-const { lineNotify } = require("../middleware/notify");
+import express from "express";
+const router = express.Router();
 
-const { login, register, currentUser } = require("../controllers/auth");
+import { auth, authAdmin } from "../middleware/auth.js";
+import { login, register, currentUser } from "../controllers/auth.js";
 
 router.get("/auth/user", auth, currentUser);
-router.get("/auth/admin", authAdmin, currentUser);
-router.post("/auth/signin", login);
-router.post("/auth/signup", register);
+router.post("/auth/login", login);
+router.post("/auth/register", register);
 
-module.exports = router;
+export default router;

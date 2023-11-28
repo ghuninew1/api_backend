@@ -1,71 +1,30 @@
-const multer = require("multer");
-const fs = require("fs");
+import multer from "multer";
+import fs from "node:fs";
 
 const timestamp = new Date().toISOString().split("T")[0];
 const path = `./public/uploads/${timestamp}`;
+
+if (!fs.existsSync(path)) {
+    fs.mkdirSync(path);
+}
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path);
     },
     filename: (req, file, cb) => {
-        const uniqueSuffix = new Date().toISOString().replace(/:/g, "-");
+        const uniqueSuffix = new Date().toISOString().slice(0, 12);
 
         cb(null, uniqueSuffix + "_" + file.originalname);
     },
 });
 
-exports.upload = (req, res, next) => {
-    try {
-        if (!fs.existsSync(path)) {
-            fs.mkdirSync(path);
-        }
-        const upload = multer({
-            storage: storage,
-            limits: { fileSize: 1024 * 1024 * 10000 },
-        }).single("file");
+export const upload = multer({
+    storage: storage,
+    limits: { fileSize: 1024 * 1024 * 10000 },
+});
 
-        upload(req, res, (err) => {
-            if (err instanceof multer.MulterError)
-                return res.status(500).json({ msg: err.message });
-            else if (err)
-                return res
-                    .status(500)
-                    .json({ msg: `Error retrieving data: ${err}` });
-
-            next();
-        });
-    } catch (err) {
-        next(err);
-    }
-};
-
-exports.uploadMultiple = (req, res, next) => {
-    try {
-        if (!fs.existsSync(path)) {
-            fs.mkdirSync(path);
-        }
-        const upload = multer({
-            storage: storage,
-            limits: { fileSize: 1024 * 1024 * 10000 },
-        }).array("files", 50);
-
-        upload(req, res, (err) => {
-            if (err instanceof multer.MulterError)
-                return res.status(500).json({ msg: err.message });
-            else if (err)
-                return res
-                    .status(500)
-                    .json({ msg: `Error retrieving data: ${err}` });
-
-            next();
-        });
-    } catch (err) {
-        next(err);
-    }
-};
-
-exports.progressUpload = (req, res, next) => {
+export const progressUpload = (req, res, next) => {
     try {
         let progres = 0;
         let file_size = req.headers["content-length"]
@@ -79,14 +38,15 @@ exports.progressUpload = (req, res, next) => {
             console.log(`Upload Progress ${persent}%`);
         });
         req.on("end", () => {
-            console.log(
-                `Upload Success ${(progres / 1024 / 1024).toFixed(3)} MB , ${
-                    req?.upload
-                }`
-            );
+            const log = `Upload Success ${(progres / 1024 / 1024).toFixed(
+                3
+            )} MB , ${req.upload}`;
+            req.upload = log;
+            console.log(log);
         });
+
         next();
     } catch (err) {
-        return res.status(500).json({ msg: `Error retrieving data: ${err}` });
+        next(err);
     }
 };

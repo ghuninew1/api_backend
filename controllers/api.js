@@ -1,11 +1,11 @@
-const fs = require("fs");
-const db = require("../models");
+import fs from "node:fs";
+import mongoose from "mongoose";
+import { createError } from "../utils/index.js";
+const db = mongoose.connection.models;
 
-exports.findAll = async (req, res) => {
+export const findAll = async (req, res, next) => {
     try {
-        const dbAll = await db.mongoose.connection.db
-            .listCollections()
-            .toArray();
+        const dbAll = await mongoose.connection.db.listCollections().toArray();
         const data = dbAll.map((item) => {
             const name = item.name && item.name;
             const type = item.type && item.type;
@@ -19,21 +19,21 @@ exports.findAll = async (req, res) => {
             count: data.length,
         });
     } catch (err) {
-        return res.status(500).json({
-            msg: `Error retrieving data: ${err}`,
-        });
+        next(err);
     }
 };
 
-exports.findOne = async (req, res) => {
+export const findOne = async (req, res, next) => {
     try {
         const name = req.params.name;
         let limit = parseInt(req.query.limit) || 20;
-        const sort = req.query.sort || "_id"; // _id || name || createdAt || updatedAt
-        const order = req.query.order || "asc"; // asc || desc
+        // sort =_id || name || createdAt || updatedAt
+        // order =asc || desc
+        const { sort, order } = req.query;
 
-        if (name === "" || name == null)
-            throw res.status(404).json({ msg: "please enter name" });
+        if (name === "" || name == null) {
+            return next(createError(404, "please enter name"));
+        }
 
         const data = await db[name]
             .find()
@@ -43,121 +43,115 @@ exports.findOne = async (req, res) => {
 
         return res.status(200).json(data);
     } catch (err) {
-        return res.status(500).json({
-            msg: `Error retrieving data: ${err}`,
-        });
+        next(err);
     }
 };
 
-exports.findById = async (req, res) => {
+export const findById = async (req, res, next) => {
     try {
-        const name = req.params.name;
-        const id = req.params.id;
+        const { name, id } = req.params;
 
-        if (name === "" || name == null)
-            throw res.status(404).json({ msg: "please enter name" });
+        if (name === "" || name == null) {
+            return next(createError(404, "please enter name"));
+        }
+
         const data = await db[name].findOne({ _id: id }).exec();
 
         return res.status(200).json(data);
     } catch (err) {
-        return res.status(500).json({
-            msg: `Error retrieving data: ${err}`,
-        });
+        next(err);
     }
 };
 
-exports.createByName = async (req, res) => {
+export const createByName = async (req, res, next) => {
     try {
         const name = req.params.name;
-        if (name === "" || name == null)
-            throw res.status(404).json({ msg: "please enter name" });
+
+        if (name === "" || name == null) {
+            return next(createError(404, "please enter name"));
+        }
 
         const data = req.body;
         if (req?.file) {
             data.file = req.file.filename && req.file.filename;
         }
+
         const fileCreate = new db[name](data);
         await fileCreate.save();
 
         return res.status(201).json(fileCreate);
     } catch (err) {
-        return res.status(500).json({
-            msg: `Error retrieving data: ${err}`,
-        });
+        next(err);
     }
 };
 
-exports.updateByid = async (req, res) => {
+export const updateByid = async (req, res, next) => {
     try {
-        const name = req.params.name;
-        const id = req.params.id;
-        if (name === "" || (name == null && id === "") || id == null)
-            throw res.status(404).json({ msg: "please enter name" });
+        const { name, id } = req.params;
+
+        if (name === "" || (name == null && id === "") || id == null) {
+            return next(createError(404, "please enter name and id"));
+        }
 
         const data = req.body;
         if (req?.file) {
             data.file = req.file.filename && req.file.filename;
         }
+
         const fileUpdate = await db[name].findOneAndUpdate({ _id: id }, data);
 
         if (fileUpdate?.file) {
             fs.unlinkSync(`./public/uploads/${fileUpdate.file}`, (err) => {
-                if (err)
-                    throw next({
-                        statusCode: 500,
-                        message: "File Error: " + err,
-                    });
-                res.status(200).json(data);
+                if (err) return next(err);
+
+                return res.status(200).json(data);
             });
         }
 
         return res.status(200).json(data);
     } catch (err) {
-        return res.status(500).json({
-            msg: `Error retrieving data: ${err}`,
-        });
+        next(err);
     }
 };
 
-exports.deleteByid = async (req, res) => {
+export const deleteByid = async (req, res, next) => {
     try {
-        const name = req.params.name;
-        const id = req.params.id;
-        if (name === "" || (name == null && id === "") || id == null)
-            throw res.status(404).json({ msg: "please enter name and id" });
+        const { name, id } = req.params;
+
+        if (name === "" || (name == null && id === "") || id == null) {
+            return next(createError(404, "please enter name and id"));
+        }
 
         const fileRemove = await db[name].findOneAndDelete({ _id: id }).exec();
 
         if (fileRemove?.file) {
             fs.unlinkSync(`./public/uploads/${fileRemove.file}`, (err) => {
-                if (err)
-                    throw res.status(500).json({ msg: "File Error: " + err });
+                if (err) return next(err);
             });
+
             res.status(200).json("Delete Success " + id);
         }
 
         return res.status(200).json("Delete Success" + id);
     } catch (err) {
-        return res.status(500).json({
-            msg: `Error retrieving data: ${err}`,
-        });
+        next(err);
     }
 };
 
-exports.deleteAll = async (req, res) => {
+export const deleteAll = async (req, res, next) => {
     try {
         const name = req.params.name;
-        if (name === "" || name == null)
-            throw res.status(404).json({ msg: "please enter name" });
+
+        if (name === "" || name == null) {
+            return next(createError(404, "please enter name"));
+        }
 
         const modelDelete = await db[name].deleteMany({}).exec();
 
-        if (!modelDelete && modelDelete.deletedCount === 0)
-            throw res.status(404).json({ msg: "Data not found" });
-        else return res.status(200).json("Delete Success");
+        if (!modelDelete && modelDelete.deletedCount === 0) {
+            return next(createError(404, "Not Found"));
+        } else return res.status(200).json("Delete Success");
     } catch (err) {
-        return res.status(500).json({
-            msg: `Error retrieving data: ${err}`,
-        });
+        next(err);
     }
 };

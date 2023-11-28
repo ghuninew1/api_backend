@@ -1,8 +1,8 @@
-const sharp = require("sharp");
-const fs = require("fs");
-const path = require("path");
+import sharp from "sharp";
+import fs from "node:fs";
+import path from "node:path";
 
-exports.convertToWebp = (directory) => {
+export const convertToWebps = (directory) => {
     fs.readdirSync(directory).forEach(async (file) => {
         const imgName = file.split(".")[0];
         const ext = path.extname(file);
@@ -23,7 +23,7 @@ exports.convertToWebp = (directory) => {
     });
 };
 
-exports.convertToWebpSingle = async (file) => {
+export const convertToWebp = async (file) => {
     const ext = path.extname(file);
     if (String(ext).match(/(png|jpg|jpeg|avif)/gi)) {
         try {
@@ -41,7 +41,7 @@ exports.convertToWebpSingle = async (file) => {
     }
 };
 
-exports.convertToAvif = (directory) => {
+export const convertToAvifs = (directory) => {
     fs.readdirSync(directory).forEach(async (file) => {
         const imgName = file.split(".")[0];
         const ext = path.extname(file);
@@ -61,7 +61,7 @@ exports.convertToAvif = (directory) => {
     });
 };
 
-exports.convertToAvifSingle = async (file) => {
+export const convertToAvif = async (file) => {
     const ext = path.extname(file);
     if (String(ext).match(/(png|jpg|jpeg|webp)/gi)) {
         try {
@@ -78,7 +78,7 @@ exports.convertToAvifSingle = async (file) => {
     }
 };
 
-exports.resizeFile = async (directory, width, height) => {
+export const resizeFiles = async (directory, width, height) => {
     fs.readdirSync(directory).forEach(async (file) => {
         const ext = path.extname(file);
         if (String(ext).match(/(png|jpg|jpeg|avif|webp)/gi)) {
@@ -105,7 +105,7 @@ exports.resizeFile = async (directory, width, height) => {
     });
 };
 
-exports.resizeFileSingle = async (file, width, height) => {
+export const resizeFile = async (file, width, height) => {
     const ext = path.extname(file);
     if (String(ext).match(/(png|jpg|jpeg|avif|webp)/gi)) {
         try {
@@ -127,4 +127,13 @@ exports.resizeFileSingle = async (file, width, height) => {
     } else {
         console.log(`Skipping ${file}`);
     }
+};
+
+export default {
+    convertToWebps,
+    convertToWebp,
+    convertToAvifs,
+    convertToAvif,
+    resizeFiles,
+    resizeFile,
 };

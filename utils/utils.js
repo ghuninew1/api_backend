@@ -1,8 +1,8 @@
-const fs = require("fs");
-const path = require("path");
-const express = require("express");
+import fs from "node:fs";
+import path from "node:path";
+import express from "express";
 
-export function mkdirRecursive(dirPath) {
+export const mkdirRecursive = (dirPath) => {
     if (!fs.existsSync(dirPath)) {
         const parent = path.dirname(dirPath);
         if (parent && parent !== dirPath) {
@@ -10,9 +10,9 @@ export function mkdirRecursive(dirPath) {
         }
         fs.mkdirSync(dirPath);
     }
-}
+};
 
-export async function serve(root, options, asyncCallback) {
+export const serve = async (root, options, asyncCallback) => {
     const app = express();
 
     app.use(express.static(root, options));
@@ -29,7 +29,7 @@ export async function serve(root, options, asyncCallback) {
             }
         });
     });
-}
+};
 
 function createApp(workerContent, opts = {}) {
     let workersByOrigin = {};

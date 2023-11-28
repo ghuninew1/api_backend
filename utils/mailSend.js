@@ -1,10 +1,9 @@
-const nodemailer = require("nodemailer");
-require("dotenv").config();
+import nodemailer from "nodemailer";
 
-exports.mailSend = async (email, subject, text, html) => {
+export const mailSend = async (email, subject, text, html) => {
     try {
         if (email !== "" && email !== undefined) {
-            let transporter = nodemailer.createTransport(
+            const transporter = nodemailer.createTransport(
                 {
                     host: "smtp.gmail.com",
                     port: 587,
@@ -22,7 +21,7 @@ exports.mailSend = async (email, subject, text, html) => {
                 }
             );
 
-            let message = {
+            const message = {
                 from: '"GhuniNew" <ghuninew@localhost.local>',
                 to: email ? email : "aakanun43@gmail.com",
                 subject: subject ? subject : "mail test",
@@ -44,3 +43,5 @@ exports.mailSend = async (email, subject, text, html) => {
         return err;
     }
 };
+
+export default mailSend;
