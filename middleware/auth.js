@@ -1,48 +1,21 @@
-import { createError, verify } from "../utils/index.js";
+import createError from "../utils/createError.js";
+import jwt from "jsonwebtoken";
 
 const secret = process.env.JWT_SECRET;
 
-export const auth = (req, res, next) => {
+export function authMid(req, res, next) {
     try {
-        const token = req.headers["authtoken"];
-        if (token == null) {
-            return next(createError(401, "token is valid!"));
-        }
+        const authHeader = req.headers["authorization"];
+        const token = authHeader && authHeader.split(" ")[1];
+        if (token == null)
+            return next(createError(401, "Unauthorized! Access Denied!"));
 
-        const decoded = verify(token, secret);
-        if (!decoded) {
-            return next(createError(403, "Unauthorized!"));
-        }
-
-        req.user = decoded;
-        req.session.user = decoded;
-
-        next();
+        jwt.verify(token, secret, (err, user) => {
+            if (err) return next(createError(403, "Forbidden! Access Denied!"));
+            req.user = user;
+            next();
+        });
     } catch (err) {
         next(err);
     }
-};
-
-export const authAdmin = (req, res, next) => {
-    try {
-        const token = req.headers["authtoken"];
-        if (token == null) {
-            return next(createError(401, "token is valid!"));
-        }
-
-        const decoded = verify(token, secret);
-        if (!decoded) {
-            return next(createError(403, "Unauthorized!"));
-        }
-
-        if (decoded.isAdmin !== true) {
-            return next(createError(403, "is not admin!"));
-        }
-
-        req.user = decoded;
-
-        next();
-    } catch (err) {
-        next(err);
-    }
-};
+}

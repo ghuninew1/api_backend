@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const qnapSchema = new mongoose.Schema(
+const QnapSchema = new mongoose.Schema(
     {
         authSid: String,
         username: String,
@@ -16,4 +16,4 @@ const qnapSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("qnap", qnapSchema, "qnap");
+export default mongoose.model("qnap", QnapSchema);

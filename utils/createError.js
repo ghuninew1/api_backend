@@ -1,7 +1,7 @@
-export function createError(status, message) {
+function createError(status, message) {
     const err = new Error();
-    err.status = status;
-    err.message = message;
+    err.status = status ? status : 500;
+    err.message = message ? message : "Internal Server Error";
     return err;
 }
 

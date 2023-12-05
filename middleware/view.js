@@ -1,4 +1,4 @@
-import Visit from "../models/visit.model.js";
+import Visit from "../models/Visit.model.js";
 
 export const visit = async (req, res, next) => {
     try {

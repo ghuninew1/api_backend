@@ -4,7 +4,7 @@ const router = express.Router();
 import { spawnSync } from "child_process";
 
 import { view, visit } from "../middleware/view.js";
-import { createError } from "../utils/createError.js";
+import createError from "../utils/createError.js";
 
 router.get("/", view, (req, res) => {
     res.status(200).json({

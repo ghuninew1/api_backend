@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const pingSchema = new mongoose.Schema(
+const PingSchema = new mongoose.Schema(
     {
         ip: String,
         res: Number,
@@ -23,4 +23,4 @@ const pingSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("ping", pingSchema, "ping");
+export default mongoose.model("Ping", PingSchema);

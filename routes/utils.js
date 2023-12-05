@@ -3,7 +3,7 @@ const router = express.Router();
 
 import { sendMail, sendNotify } from "../controllers/utils.js";
 
-router.post("/notify", sendNotify);
-router.post("/mail", sendMail);
+router.post("/send/notify", sendNotify);
+router.post("/send/mail", sendMail);
 
 export default router;

@@ -1,27 +1,21 @@
 import mongoose from "mongoose";
-// import fs from "node:fs";
+import { readdirSync } from "node:fs";
 
-// mongoose configuration
-// mongoose.Promise = global.Promise;
+const pathDb = process.cwd() + "/models";
+const db = {};
 
-// // name of the database
-// const modelsDir = "./models";
-// const modelFiles = fs
-//     .readdirSync(modelsDir)
-//     .filter((file) => file.endsWith("model.js"));
-// const names = modelFiles.map((file) => file.slice(0, -9));
+const dbModel = readdirSync(pathDb).filter(
+    (f) => f !== "index.js" && f.endsWith(".js")
+);
+const dbModelName = dbModel.map((r) => r.split(".")[0]);
 
-// // import all models
-// const db = {};
-// names.forEach(async (n) => {
-//     db[n] = await import(`./${n}.model`);
-// });
+const importModel = dbModel.map(
+    async (model) => await import(`${pathDb}/${model}`)
+);
 
-// // db object
-// db.names = names;
+db.mongoose = mongoose;
 
-// connect to MongoDB
-export async function connect() {
+db.connect = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI);
         console.log(
@@ -29,21 +23,33 @@ export async function connect() {
             mongoose.connection.name
         );
     } catch (error) {
-        throw error;
+        throw console.log("Error connecting to MongoDB", error);
     }
-}
-export default connect;
+};
 
-// export { default as visit } from "./visit.model.js";
-// export { default as users } from "./users.model.js";
-// export { default as ping } from "./ping.model.js";
-// export { default as qnap } from "./qnap.model.js";
-// export { default as files } from "./files.model.js";
+Promise.all(importModel)
+    .then((modules) => {
+        return modules.forEach(async (module) => {
+            const modelName = await module.default.modelName;
+            db[modelName] = module.default;
+            db[modelName].modelName = modelName;
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+    .finally(async () => {
+        await db.connect();
+    });
 
-// export default db = {
-//     visit,
-//     users,
-//     ping,
-//     qnap,
-//     files,
-// };
+db.url = process.env.MONGODB_URI;
+db.names = dbModelName;
+
+db.db = () => mongoose.connection.db;
+
+db.collection = (name) => mongoose.connection.db.collection(name);
+
+db.collectionNames = async () =>
+    await mongoose.connection.db.listCollections().toArray();
+
+export default db;

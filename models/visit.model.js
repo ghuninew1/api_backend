@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const visitSchema = new mongoose.Schema(
+const VisitSchema = new mongoose.Schema(
     {
         url: {
             type: String,
@@ -20,4 +20,4 @@ const visitSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("visit", visitSchema, "visit");
+export default mongoose.model("visit", VisitSchema);

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const filesSchema = new mongoose.Schema(
+const FileSchema = new mongoose.Schema(
     {
         name: String,
         alt: String,
@@ -18,4 +18,4 @@ const filesSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("files", filesSchema, "files");
+export default mongoose.model("file", FileSchema);

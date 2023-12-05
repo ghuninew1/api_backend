@@ -2,14 +2,14 @@ import path from "node:path";
 import fs from "node:fs";
 
 import {
-    createError,
     resizeFile,
     resizeFiles,
     convertToAvif,
     convertToWebp,
-} from "../utils/index.js";
+} from "../utils/sharp.js";
+import createError from "../utils/createError.js";
 
-const pathUpload = path.join(__dirname, "../public/uploads");
+const pathUpload = path.join(process.cwd(), "public/uploads");
 const hostPublic = (req) => req.protocol + "://" + req.get("host") + "/uploads";
 const timestamp = new Date().toISOString().split("T")[0];
 const source = pathUpload + `/${timestamp}`;
@@ -144,3 +144,18 @@ export const listFiles = (req, res, next) => {
         next(err);
     }
 };
+
+export function downloadFile(req, res, next) {
+    const file = req.params.name;
+    const directory = req.params.directory;
+    const path = `${__dirname}/../public/uploads/${directory}/${file}`;
+    res.download(path, file, (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("success");
+        }
+    });
+}
+
+// Path: utils/sharp.js

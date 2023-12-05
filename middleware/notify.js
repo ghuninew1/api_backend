@@ -1,6 +1,6 @@
 import { lineNotify } from "../utils/lineNotify";
 
-export const sendNotify = async (req, res, next) => {
+const sendNotify = async (req, res, next) => {
     try {
         const user = req.body.username;
         const ip = req.ip || req.ips;
@@ -19,3 +19,4 @@ export const sendNotify = async (req, res, next) => {
         next(err);
     }
 };
+export default sendNotify;

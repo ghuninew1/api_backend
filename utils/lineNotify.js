@@ -1,21 +1,24 @@
 import axios from "axios";
 
-export const lineNotify = async (message) => {
+const lineNotify = (message) => {
     try {
-        if (message !== undefined && message !== "") {
-            const url = process.env.LINE_NOTIFY_URL;
-            const headers = {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization: `Bearer ${process.env.LINE_NOTIFY_TONKEN2}`,
-            };
-            const body = `message=${message.replace(/ /g, "%20")}`;
+        if (message === "" && message == null) {
+            return Promise.reject("message is empty");
+        }
 
-            const dataSent = await axios.post(url, body, { headers });
-            const data = await dataSent.data;
+        const url = process.env.LINE_NOTIFY_URL;
+        const headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Bearer ${process.env.LINE_NOTIFY_TONKEN2}`,
+        };
+        const body = `message=${message.replace(/ /g, "%20")}`;
 
-            return data;
-        } else console.log("Not Found enter message");
+        const dataSent = axios.post(url, body, { headers });
+
+        return Promise.resolve(dataSent.data);
     } catch (err) {
-        console.log(err.message);
+        return Promise.reject(err);
     }
 };
+
+export default lineNotify;

@@ -15,18 +15,18 @@
         "dev": "nodemon --env-file=.env server.js",
         "debug": "DEBUG=app:* nodemon --env-file=.env server.js",
         "pm2": "pm2 start --env-file=.env server.js",
-        "dev2": "bun --watch run --env-file=.env server.js",
-        "build": "esbuild --bundle --minify --platform=node --target=node18 --outfile=get_sid.js utils/get_sid.js",
+        "devbun": "bun --watch run --env-file=.env server.js",
+        "build2": "esbuild --bundle --minify --platform=node --target=node18 --outfile=get_sid.js utils/get_sid.js",
         "start": "node --env-file=.env server.js"
     },
     "dependencies": {
         "axios": "^1.6.2",
-        "express": "5.0.0-beta.1",
+        "express": "^4.18.2",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.0.1"
+        "mongoose": "^8.0.2"
     },
     "devDependencies": {
-        "@types/node": "^20.10.0",
+        "@types/node": "^20.10.3",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.20.2",
         "cors": "^2.8.5",
@@ -35,7 +35,7 @@
         "morgan": "^1.10.0",
         "multer": "1.4.5-lts.1",
         "nodemailer": "^6.9.7",
-        "nodemon": "^3.0.1",
+        "nodemon": "^3.0.2",
         "ping": "^0.4.4",
         "sharp": "^0.32.6",
         "xml2js": "^0.6.2"
@@ -43,5 +43,6 @@
     "keywords": [],
     "exports": "./server.js",
     "engines": {
-        "node": ">=16.0.0"}
+        "node": ">=16.0.0"
+    }
 }

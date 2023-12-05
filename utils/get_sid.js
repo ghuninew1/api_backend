@@ -193,6 +193,5 @@ function C(c) {
     }
     return e;
 }
-// module.exports = { ezEncode: C, utf16to8: x, utf8to16: n };
-export default { ezEncode: C, utf16to8: x, utf8to16: n };
-export { ezEncode as ezEncode, utf16to8 as utf16to8, utf8to16 as utf8to16 };
+
+export { C as ezEncode, x as utf16to8, n as utf8to16 };

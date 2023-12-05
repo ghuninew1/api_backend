@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const usersSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
     {
         username: {
             type: String,
@@ -16,12 +16,15 @@ const usersSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        tokens: [
-            {
-                token: String,
-                expires: Date,
-            },
-        ],
+        token: {
+            type: String,
+        },
+        refreshToken: {
+            type: String,
+        },
+        expires: {
+            type: Date,
+        },
         img: {
             type: String,
         },
@@ -36,4 +39,4 @@ const usersSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("users", usersSchema, "users");
+export default mongoose.model("user", UserSchema);

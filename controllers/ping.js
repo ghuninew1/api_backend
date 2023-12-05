@@ -1,6 +1,6 @@
 import ping from "ping";
 import dns from "node:dns";
-import Visit from "../models/visit.model.js";
+import Visit from "../models/Visit.model.js";
 
 export const pingCheck = async (req, res) => {
     try {

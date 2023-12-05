@@ -1,11 +1,10 @@
 import fs from "node:fs";
-import mongoose from "mongoose";
-import { createError } from "../utils/index.js";
-const db = mongoose.connection.models;
+import createError from "../utils/createError.js";
+import db from "../models/index.js";
 
 export const findAll = async (req, res, next) => {
     try {
-        const dbAll = await mongoose.connection.db.listCollections().toArray();
+        const dbAll = await db.collectionNames();
         const data = dbAll.map((item) => {
             const name = item.name && item.name;
             const type = item.type && item.type;
@@ -74,6 +73,7 @@ export const createByName = async (req, res, next) => {
         const data = req.body;
         if (req?.file) {
             data.file = req.file.filename && req.file.filename;
+            data.filePath = req.headers.host + "/uploads/" + req.file.filename;
         }
 
         const fileCreate = new db[name](data);
@@ -89,13 +89,14 @@ export const updateByid = async (req, res, next) => {
     try {
         const { name, id } = req.params;
 
-        if (name === "" || (name == null && id === "") || id == null) {
+        if (name === "" || name == null || id == null) {
             return next(createError(404, "please enter name and id"));
         }
 
         const data = req.body;
         if (req?.file) {
             data.file = req.file.filename && req.file.filename;
+            data.filePath = req.headers.host + "/uploads/" + req.file.filename;
         }
 
         const fileUpdate = await db[name].findOneAndUpdate({ _id: id }, data);
@@ -118,7 +119,7 @@ export const deleteByid = async (req, res, next) => {
     try {
         const { name, id } = req.params;
 
-        if (name === "" || (name == null && id === "") || id == null) {
+        if (name === "" || name == null || id == null) {
             return next(createError(404, "please enter name and id"));
         }
 
