@@ -73,7 +73,6 @@ export const createByName = async (req, res, next) => {
         const data = req.body;
         if (req?.file) {
             data.file = req.file.filename && req.file.filename;
-            data.filePath = req.headers.host + "/uploads/" + req.file.filename;
         }
 
         const fileCreate = new db[name](data);
@@ -96,7 +95,6 @@ export const updateByid = async (req, res, next) => {
         const data = req.body;
         if (req?.file) {
             data.file = req.file.filename && req.file.filename;
-            data.filePath = req.headers.host + "/uploads/" + req.file.filename;
         }
 
         const fileUpdate = await db[name].findOneAndUpdate({ _id: id }, data);

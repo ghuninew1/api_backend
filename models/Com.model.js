@@ -4,12 +4,13 @@ const ComSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true,
         },
-        user: String,
+        user: {
+            type: String,
+        },
+
         ip: {
             type: String,
-            required: true,
         },
         cpu: {
             type: String,
@@ -18,7 +19,7 @@ const ComSchema = new mongoose.Schema(
             type: String,
         },
         hdd: {
-            type: Array,
+            type: String,
         },
         gpu: {
             type: String,
@@ -33,7 +34,7 @@ const ComSchema = new mongoose.Schema(
             type: Boolean,
         },
         program: {
-            type: Array,
+            type: String,
         },
         subscribes: {
             type: String,
@@ -52,4 +53,6 @@ const ComSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("com", ComSchema);
+const Com = mongoose.model("Com", ComSchema);
+
+export default Com;

@@ -5,7 +5,8 @@ const secret = process.env.JWT_SECRET;
 
 export function authMid(req, res, next) {
     try {
-        const authHeader = req.headers["authorization"];
+        const authHeader =
+            req.headers["authorization"] || req.headers.authorization;
         const token = authHeader && authHeader.split(" ")[1];
         if (token == null)
             return next(createError(401, "Unauthorized! Access Denied!"));

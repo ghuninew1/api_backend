@@ -37,13 +37,9 @@ Promise.all(importModel)
     })
     .catch((err) => {
         console.log(err);
-    })
-    .finally(async () => {
-        await db.connect();
     });
 
 db.url = process.env.MONGODB_URI;
-db.names = dbModelName;
 
 db.db = () => mongoose.connection.db;
 

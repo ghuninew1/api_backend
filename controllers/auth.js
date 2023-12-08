@@ -69,7 +69,7 @@ export async function login(req, res, next) {
             await user.save();
             user.password = undefined;
 
-            return res.status(200).json({ token: accessToken });
+            return res.status(200).json(user);
         } else if (Date.now() > user.expires) {
             const accessToken = generateAccessToken(payload);
             user.token = accessToken;
@@ -78,11 +78,11 @@ export async function login(req, res, next) {
             await user.save();
             user.password = undefined;
 
-            return res.status(200).json({ token: accessToken });
+            return res.status(200).json(user);
         } else {
             user.password = undefined;
 
-            return res.status(200).json({ token: user.token });
+            return res.status(200).json(user);
         }
     } catch (err) {
         next(err);
@@ -91,15 +91,16 @@ export async function login(req, res, next) {
 
 export function isUser(req, res, next) {
     try {
-        const { username, isAdmin } = req.user;
+        const authHeader =
+            req.headers["authorization"] || req.headers.authorization;
+        const token = authHeader && authHeader.split(" ")[1];
 
-        if (!username) {
-            return next(createError(400, "user not found"));
-        }
+        if (token == null)
+            return next(createError(401, "Unauthorized! Access Denied!"));
 
-        return isAdmin
-            ? res.status(200).json({ username, isAdmin: true })
-            : res.status(200).json({ username, isAdmin: false });
+        const decoded = jwt.verify(token, secret);
+
+        res.status(200).json(decoded);
     } catch (err) {
         next(err);
     }

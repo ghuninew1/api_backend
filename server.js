@@ -11,7 +11,9 @@ import {
     utilsRoute,
     pingRoute,
     corsOptions,
+    comRoute,
 } from "./routes/index.js";
+import db from "./models/index.js";
 
 const app = express();
 app.disable("x-powered-by");
@@ -49,7 +51,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/", rootRoute, authRoute, utilsRoute, pingRoute, apiRoute);
+app.use("/", rootRoute, authRoute, utilsRoute, pingRoute, apiRoute, comRoute);
 
 // error handler
 app.use((err, req, res, next) => {
@@ -63,6 +65,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(process.env.PORT || 8800, () => {
+    db.connect();
     console.log(
         `Server is running http://localhost:${process.env.PORT || 8800}`
     );

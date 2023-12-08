@@ -14,8 +14,8 @@ import {
     deleteByid,
 } from "../controllers/api.js";
 
-router.get("/api", authMid, view, findAll);
-router.get("/api/:name", authMid, findOne);
+router.get("/api", view, findAll);
+router.get("/api/:name", findOne);
 router.get("/api/:name/:id", /* auth, */ findById);
 router.post("/api/:name", createByName);
 router.put("/api/:name/:id", updateByid);
